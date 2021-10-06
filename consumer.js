@@ -24,6 +24,19 @@ async function wait(ms) {
   await setTimeout(() => { }, ms);
 }
 
+function randomIntFromInterval(min, max) { // min and max included 
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
+var exercisesVisited = [];
+async function randomizeExercises(testSize) {
+  var num = randomIntFromInterval(1, testSize);
+  while (exercisesVisited.includes(num)) {
+    num = randomIntFromInterval(1, testSize);
+  }
+  exercisesVisited.push(num);
+  return num;
+}
+
 
 
 async function exerciseTimeUp(id, description) {
@@ -44,6 +57,8 @@ async function exerciseTimeUp(id, description) {
         environment: process.env.NODE_ENV,
         session: user.subject,
       });
+      
+      console.log(randomizeExercises(test.exercises.length));
 
       const exercise = test.exercises[room.lastExercise];
 
