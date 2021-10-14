@@ -28,11 +28,13 @@ const tests = require("./routes/tests.js");
 const admin = require("./routes/admin");
 const consumer = require("./consumer.js");
 const participants = require("./routes/participants");
+const random = require("./routes/random");
 
 app.use(auth);
 app.use(tests);
 app.use(admin);
 app.use(participants);
+app.use(random);
 
 app.get("/", (req, res) => {
   res.redirect(process.env.FRONTEND_URL);
