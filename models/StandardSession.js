@@ -12,7 +12,8 @@ const SessionSchema = new Schema({
   exerciseCounter: { type: Number, default: -1 },
   blindParticipant: { type: Boolean, default: true },
   exercises: { type: Array, required: true },
-  breaks: { type: Array, required: true }
+  breaks: { type: Array, required: true },
+  partsTimes: { type: Array, required: true, default: [600, 300, 600] }
 });
 
 SessionSchema.index(
