@@ -38,18 +38,18 @@ router.get("/StandardSession/:sessionName", async (req, res) => {
 
 router.post("/newtStandardSession", async (req, res) => {
     const session = await StandardSession.create({
-        name: "New Standard Session Test",
+        name: req.body.name,
         environment: process.env.NODE_ENV,
-        active: false,
-        tokens: ["token"],
-        running: false,
-        registrationText: "thanks for participating",
-        finishMessage: "THE END",
-        exerciseCounter: 0,
-        blindParticipant: true,
-        exercises: [],
-        breaks: [],
-        partsTimes: [600, 300, 600]
+        active: req.body.active,
+        tokens: req.body.tokens,
+        running: req.body.running,
+        registrationText: req.body.registrationText,
+        finishMessage: req.body.finishMessage,
+        exerciseCounter: req.body.exerciseCounter,
+        blindParticipant: req.body.blindParticipant,
+        exercises: req.body.exercises,
+        breaks: req.body.breaks,
+        partsTimes: req.body.partsTimes
     });
 
     session.save();
