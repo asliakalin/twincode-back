@@ -1,8 +1,14 @@
 require("dotenv").config();
 var express = require("express");
 const router = express.Router();
+const consumer = require("../consumer.js");
 const StandardSession = require("../models/StandardSession.js");
 
+
+router.post("/testSS/:sessionName", async (req, res) => {
+    consumer.startStandardSession(req.params.sessionName, req.app._io);
+    res.send({status: 200});
+});
 
 router.post("/startStandardSession/:sessionName", async (req, res) => {
     const adminSecret = req.headers.authorization;

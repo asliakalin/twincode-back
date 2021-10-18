@@ -797,4 +797,7 @@ module.exports = {
 
     io.on("connection", connection);
   },
+  startStandardSession: function (standardSessionName, io) {
+    Logger.dbg("startStandardSession " + standardSessionName);
+  },
 };
