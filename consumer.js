@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const Logger = require("./logger.js");
 const Session = require("./models/Session.js");
+const StandardSession = require("./models/StandardSession.js");
 const User = require("./models/User.js");
 const Room = require("./models/Room.js");
 const Test = require("./models/Test.js");
@@ -797,7 +798,21 @@ module.exports = {
 
     io.on("connection", connection);
   },
-  startStandardSession: function (standardSessionName, io) {
+  startStandardSession: async function (standardSessionName, io) {
     Logger.dbg("startStandardSession " + standardSessionName);
+    var isStandard = false;
+    var thisSession = await Session.findOne({
+      name: standardSessionName,
+      environment: process.env.NODE_ENV,
+    });
+    if (thisSession == null) {
+      thisSession = await StandardSession.findOne({
+        name: standardSessionName,
+        environment: process.env.NODE_ENV,
+      });
+      isStandard = true;
+    }
+    
+    console.log(thisSession);
   },
 };
