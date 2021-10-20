@@ -6,6 +6,7 @@ const Test = require("../models/Test.js");
 const Logger = require("../logger.js");
 const User = require("../models/User.js");
 const Session = require("../models/Session.js");
+const StandardSession = require("../models/StandardSession.js");
 const Log = require("../models/Log.js");
 const consumer = require("../consumer.js");
 // Import csv-writer
@@ -151,6 +152,15 @@ router.get("/status/:sessionName", async (req, res) => {
     name: req.params.sessionName,
     environment: process.env.NODE_ENV,
   });
+  /*
+  if (retrievedSession == null) {
+    retrievedSession = await StandardSession.findOne({
+      name: req.params.sessionName,
+      environment: process.env.NODE_ENV,
+    });
+  }
+  console.log(retrievedSession);
+  */
   if (retrievedSession != null) {
     res.send({
       exists: true,
