@@ -5,27 +5,14 @@ const consumer = require("../consumer.js");
 const StandardSession = require("../models/StandardSession.js");
 
 
-router.post("/testSS/:sessionName", async (req, res) => {
-    consumer.startStandardSession(req.params.sessionName, req.app._io);
-    res.send({status: 200});
-});
-
 router.post("/startStandardSession/:sessionName", async (req, res) => {
     const adminSecret = req.headers.authorization;
-
+  
     if (adminSecret === process.env.ADMIN_SECRET) {
-    
-        const session = await StandardSession.findOne({
-            name: req.params.sessionName,
-            environment: process.env.NODE_ENV,
-        });
-
-        session.running = true;
-        session.save(); //Saves it on database
-
-        res.send({ msg: "Standard Session started" });
+      consumer.startSession(req.params.sessionName, req.app._io);
+      res.send({ msg: "Session started" });
     } else {
-        res.sendStatus(401);
+      res.sendStatus(401);
     }
 });
 

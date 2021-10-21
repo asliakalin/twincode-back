@@ -5,6 +5,7 @@ const User = require("../models/User.js");
 const nodemailer = require("nodemailer");
 const Logger = require("../logger.js");
 const Session = require("../models/Session.js");
+const StandardSession = require("../models/StandardSession.js");
 
 router.post("/login", (req, res) => {
   let responseBody = {
@@ -59,11 +60,17 @@ router.post("/signup", async (req, res) => {
   const newUser = new User(req.body);
   newUser.code = code;
 
-  const session = await Session.findOne({
+  var session = await Session.findOne({
     name: req.body.subject,
     environment: process.env.NODE_ENV,
   });
-
+  if (session == null) {
+    session = await StandardSession.findOne({
+      name: req.body.subject,
+      environment: process.env.NODE_ENV,
+    });
+  }
+  
   if (session != null && session.active && !session.running) {
     const bodyResponse = {
       registrationText:

@@ -5,6 +5,7 @@ var cookieParser = require("cookie-parser");
 var cors = require("cors");
 const Logger = require("./logger.js");
 const Session = require("./models/Session.js");
+const StandardSession = require("./models/StandardSession.js");
 const User = require("./models/User.js");
 const io = require("socket.io");
 
@@ -51,11 +52,16 @@ app.post("/registerUser", async (req, res) => {
     
     Logger.dbg("/registerUser - User retrieved",user,["code","mail"]);
     
-    const session = await Session.findOne({
+    var session = await Session.findOne({
       name: user.subject,
       environment: process.env.NODE_ENV,
     });
-    
+    if (session == null) {
+      session = await StandardSession.findOne({
+        name: user.subject,
+        environment: process.env.NODE_ENV,
+      });
+    }
     Logger.dbg("/registerUser - Session retrieved",session,["name","pairingMode","tokenPairing","blindParticipant"]);
 
     if (session && session.tokens.indexOf(req.body.tokenId) > -1) {
@@ -85,27 +91,60 @@ app.get("/joinSession", async (req, res) => {
         Session.findOne({
           name: user.subject,
           environment: process.env.NODE_ENV,
-        })
-          .then((session) => {
-            if (session) {
-              if (session.active) {
-                res.send({ code: req.query.code });
-                Logger.dbg("/joinSession - Active - "+ req.query.code);
+        }).then((session1) => {
+          if (session1 == null) {
+            StandardSession.findOne({
+              name: user.subject,
+              environment: process.env.NODE_ENV,
+            })
+            .then((session) => {
+              if (session) {
+                if (session.active) {
+                  res.send({ code: req.query.code });
+                  Logger.dbg("/joinSession - Active - "+ req.query.code);
+                } else {
+                  Logger.dbg("/joinSession - Not active - "+ req.query.code);
+                  res.send(
+                    "Session is not active yet. If you think it is an error, contact with your coordinator."
+                  );
+                }
               } else {
-                Logger.dbg("/joinSession - Not active - "+ req.query.code);
-                res.send(
-                  "Session is not active yet. If you think it is an error, contact with your coordinator."
-                );
+                Logger.dbgerr("/joinSession - 401a - "+ req.query.code);
+                res.sendStatus(401);
               }
-            } else {
-              Logger.dbgerr("/joinSession - 401a - "+ req.query.code);
-              res.sendStatus(401);
-            }
-          })
-          .catch((err) => {
-            Logger.dbgerr("/joinSession - 500a - "+ req.query.code,err);
-            res.sendStatus(500);
-          });
+            })
+            .catch((err) => {
+              Logger.dbgerr("/joinSession - 500a - "+ req.query.code,err);
+              res.sendStatus(500);
+            });
+          } else {
+            Session.findOne({
+              name: user.subject,
+              environment: process.env.NODE_ENV,
+            })
+              .then((session) => {
+                if (session) {
+                  if (session.active) {
+                    res.send({ code: req.query.code });
+                    Logger.dbg("/joinSession - Active - "+ req.query.code);
+                  } else {
+                    Logger.dbg("/joinSession - Not active - "+ req.query.code);
+                    res.send(
+                      "Session is not active yet. If you think it is an error, contact with your coordinator."
+                    );
+                  }
+                } else {
+                  Logger.dbgerr("/joinSession - 401a - "+ req.query.code);
+                  res.sendStatus(401);
+                }
+              })
+              .catch((err) => {
+                Logger.dbgerr("/joinSession - 500a - "+ req.query.code,err);
+                res.sendStatus(500);
+              });
+  
+          }
+        });
       } else {
         Logger.dbgerr("/joinSession - 401b - "+ req.query.code);
         res.sendStatus(401);

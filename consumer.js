@@ -61,7 +61,6 @@ async function exerciseTimeUp(id, description) {
         session: user.subject,
       });
       
-      console.log(randomizeExercises(test.exercises.length));
 
       //Until here, the function looks for an user, coinciding with id. Looks for his/her room and the test in which he/she is
       const exercise = test.exercises[room.lastExercise];
@@ -104,126 +103,137 @@ async function executeSession(sessionName, io) {
   Logger.dbg("executeSession - Cleared last event of session " + sessionName);
 
   Logger.dbg("executeSession - Starting " + sessionName);
-  const session = await Session.findOne({
+  var isStandard = false;
+  var session = await Session.findOne({
     name: sessionName,
     environment: process.env.NODE_ENV,
   });
+  if (session == null) {
+    session = await StandardSession.findOne({
+      name: sessionName,
+      environment: process.env.NODE_ENV,
+    });
+    isStandard = true;
+  }
+  if (!isStandard) {
+    session.running = true;
+    session.save(); //Saves it on database
+    Logger.dbg("executeSession - Running ", session, ["name", "pairingMode", "tokenPairing", "blindParticipant"]);
+    //Pick all tests
+    const tests = await Test.find({
+      session: session.name,
+      environment: process.env.NODE_ENV,
+    }).sort({ orderNumber: 1 });
+    //Number of tests in a session
+    const numTests = tests.length;
+    //testCounter = session attribute that shows the order of the tests (actual test)
+    let timer = 0;
+    let maxExercises = tests[session.testCounter].exercises.length;
 
-  session.running = true;
-  session.save(); //Saves it on database
-  Logger.dbg("executeSession - Running ", session, ["name", "pairingMode", "tokenPairing", "blindParticipant"]);
-  //Pick all tests
-  const tests = await Test.find({
-    session: session.name,
-    environment: process.env.NODE_ENV,
-  }).sort({ orderNumber: 1 });
-  //Number of tests in a session
-  const numTests = tests.length;
-  //testCounter = session attribute that shows the order of the tests (actual test)
-  let timer = 0;
-  let maxExercises = tests[session.testCounter].exercises.length;
+    Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + numTests + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
+    //Here it is loaded the test
+    var event = ["loadTest", {
+      data: {
+        testDescription: tests[0].description,
+        peerChange: tests[0].peerChange,
+      }
+    }];
 
-  Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + numTests + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
-  //Here it is loaded the test
-  var event = ["loadTest", {
-    data: {
-      testDescription: tests[0].description,
-      peerChange: tests[0].peerChange,
-    }
-  }];
+    io.to(sessionName).emit(event[0], event[1]);
 
-  io.to(sessionName).emit(event[0], event[1]);
+    lastSessionEvent.set(sessionName, event);
+    Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
 
-  lastSessionEvent.set(sessionName, event);
-  Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
+    //Start of the tests, following a time line
+    const interval = setInterval(function () {
+      //If this session quantity of tests is the same test than loaded
+      if (session.testCounter == numTests) {
+        Logger.dbg("There are no more tests, the session <" + session.name + "> has finish!");
+        Logger.dbg("executeSession - emitting 'finish' event in session " + session.name + " #############################");
 
-  //Start of the tests, following a time line
-  const interval = setInterval(function () {
-    //If this session quantity of tests is the same test than loaded
-    if (session.testCounter == numTests) {
-      Logger.dbg("There are no more tests, the session <" + session.name + "> has finish!");
-      Logger.dbg("executeSession - emitting 'finish' event in session " + session.name + " #############################");
+        io.to(sessionName).emit("finish");
+        lastSessionEvent.set(sessionName, ["finish"]);
+        Logger.dbg("executeSession - lastSessionEvent saved", event);
 
-      io.to(sessionName).emit("finish");
-      lastSessionEvent.set(sessionName, ["finish"]);
-      Logger.dbg("executeSession - lastSessionEvent saved", event);
+        clearInterval(interval);
+      } else if (timer > 0) { //If timer hasn't finished counting, it goes down
+        io.to(sessionName).emit("countDown", {
+          data: timer,
+        });
+        Logger.dbg(timer);
+        timer--;
+      } else if (session.exerciseCounter == maxExercises) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
+        Logger.dbg("Going to the next test!");
+        session.testCounter++;
+        session.exerciseCounter = -1;
+      } else if (session.exerciseCounter === -1) { //If exercises have been finished, it pass to a new test
+        Logger.dbg("Loading test");
 
-      clearInterval(interval);
-    } else if (timer > 0) { //If timer hasn't finished counting, it goes down
-      io.to(sessionName).emit("countDown", {
-        data: timer,
-      });
-      Logger.dbg(timer);
-      timer--;
-    } else if (session.exerciseCounter == maxExercises) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
-      Logger.dbg("Going to the next test!");
-      session.testCounter++;
-      session.exerciseCounter = -1;
-    } else if (session.exerciseCounter === -1) { //If exercises have been finished, it pass to a new test
-      Logger.dbg("Loading test");
-
-      var event = ["loadTest", {
-        data: {
-          testDescription: tests[session.testCounter].description,
-          peerChange: tests[session.testCounter].peerChange,
-        },
-      }];
-      io.to(sessionName).emit(event[0], event[1]);
-
-      lastSessionEvent.set(sessionName, event);
-      Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
-
-
-      timer = tests[session.testCounter].time; //Resets the timer
-      session.exerciseCounter = 0;
-      Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + numTests + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
-
-    } else { //If nothing before happens, it means that there are more exercises to do, and then in goes to the next one
-      Logger.dbg("Starting new exercise:");
-      let testLanguage = tests[session.testCounter].language;
-      let exercise =
-        tests[session.testCounter].exercises[session.exerciseCounter];
-      if (exercise) {
-        Logger.dbg("   " + exercise.description.substring(0, Math.min(80, exercise.description.length)) + "...");
-
-        var event = ["newExercise", {
+        var event = ["loadTest", {
           data: {
-            maxTime: exercise.time,
-            exerciseDescription: exercise.description,
-            exerciseType: exercise.type,
-            inputs: exercise.inputs,
-            solutions: exercise.solutions,
-            testLanguage: testLanguage,
+            testDescription: tests[session.testCounter].description,
+            peerChange: tests[session.testCounter].peerChange,
           },
         }];
         io.to(sessionName).emit(event[0], event[1]);
+
         lastSessionEvent.set(sessionName, event);
         Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
 
-        sessions.set(session.name, {
-          session: session,
-          exerciseType: exercise.type,
-        });
-        timer = exercise.time;
-      }
-      session.exerciseCounter++; //After that, it increments the counter to test in the before code if thera are more or not
-      Logger.dbg(" testCounter: " + session.testCounter + " of " + numTests + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
 
-      session.save();
-      Logger.dbg("executeSession - session saved ");
-    }
+        timer = tests[session.testCounter].time; //Resets the timer
+        session.exerciseCounter = 0;
+        Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + numTests + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
 
-    //If the session is not running, it's beacuse it has not been active or it has finished, so it clears all before
-    Session.findOne({
-      name: sessionName,
-      environment: process.env.NODE_ENV,
-    }).then((currentSession) => {
-      if (!currentSession.running) {
-        clearInterval(interval);
-        Logger.dbg("executeSession - clearInterval");
+      } else { //If nothing before happens, it means that there are more exercises to do, and then in goes to the next one
+        Logger.dbg("Starting new exercise:");
+        let testLanguage = tests[session.testCounter].language;
+        let exercise =
+          tests[session.testCounter].exercises[session.exerciseCounter];
+        if (exercise) {
+          Logger.dbg("   " + exercise.description.substring(0, Math.min(80, exercise.description.length)) + "...");
+
+          var event = ["newExercise", {
+            data: {
+              maxTime: exercise.time,
+              exerciseDescription: exercise.description,
+              exerciseType: exercise.type,
+              inputs: exercise.inputs,
+              solutions: exercise.solutions,
+              testLanguage: testLanguage,
+            },
+          }];
+          io.to(sessionName).emit(event[0], event[1]);
+          lastSessionEvent.set(sessionName, event);
+          Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
+
+          sessions.set(session.name, {
+            session: session,
+            exerciseType: exercise.type,
+          });
+          timer = exercise.time;
+        }
+        session.exerciseCounter++; //After that, it increments the counter to test in the before code if thera are more or not
+        Logger.dbg(" testCounter: " + session.testCounter + " of " + numTests + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
+
+        session.save();
+        Logger.dbg("executeSession - session saved ");
       }
-    });
-  }, 1000);
+
+      //If the session is not running, it's beacuse it has not been active or it has finished, so it clears all before
+      Session.findOne({
+        name: sessionName,
+        environment: process.env.NODE_ENV,
+      }).then((currentSession) => {
+        if (!currentSession.running) {
+          clearInterval(interval);
+          Logger.dbg("executeSession - clearInterval");
+        }
+      });
+    }, 1000);
+  } else {
+    console.log("ES ESTANDAR");
+  }
 }
 
 
@@ -253,10 +263,16 @@ async function notifyParticipants(sessionName, io) {
     return;
   }
 
-  const session = await Session.findOne({
+  var session = await Session.findOne({
     name: sessionName,
     environment: process.env.NODE_ENV,
   });
+  if (session == null) {
+    session = await StandardSession.findOne({
+      name: sessionName,
+      environment: process.env.NODE_ENV,
+    });
+  }
 
   var excluded = { code: "XXXX" };
 
@@ -797,22 +813,5 @@ module.exports = {
     }
 
     io.on("connection", connection);
-  },
-  startStandardSession: async function (standardSessionName, io) {
-    Logger.dbg("startStandardSession " + standardSessionName);
-    var isStandard = false;
-    var thisSession = await Session.findOne({
-      name: standardSessionName,
-      environment: process.env.NODE_ENV,
-    });
-    if (thisSession == null) {
-      thisSession = await StandardSession.findOne({
-        name: standardSessionName,
-        environment: process.env.NODE_ENV,
-      });
-      isStandard = true;
-    }
-    
-    console.log(thisSession);
   },
 };

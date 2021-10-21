@@ -147,20 +147,18 @@ router.get("/tests/:sessionName", (req, res) => {
   }
 });
 
-router.get("/status/:sessionName", async (req, res) => {
-  const retrievedSession = await Session.findOne({
+router.get("/status/:sessionName", async (req, res) => {  
+  var retrievedSession = await Session.findOne({
     name: req.params.sessionName,
     environment: process.env.NODE_ENV,
   });
-  /*
   if (retrievedSession == null) {
     retrievedSession = await StandardSession.findOne({
       name: req.params.sessionName,
       environment: process.env.NODE_ENV,
     });
   }
-  console.log(retrievedSession);
-  */
+
   if (retrievedSession != null) {
     res.send({
       exists: true,
