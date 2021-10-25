@@ -232,7 +232,17 @@ async function executeSession(sessionName, io) {
       });
     }, 1000);
   } else {
+    session.running = true;
+    session.save(); //Saves it on database
     console.log("ES ESTANDAR");
+    /*
+    var event = ["loadTest", {
+      data: {
+        testDescription: tests[0].description,
+        peerChange: tests[0].peerChange,
+      }
+    }];
+    */
   }
 }
 
@@ -247,6 +257,7 @@ async function notifyParticipants(sessionName, io) {
   var participants = [];
   Logger.dbg("notifyParticipants - Number of potential participants: " + potentialParticipants.length);
   potentialParticipants.forEach((p) => {
+    console.log(p);
     //Filter out the one not connected : they don't have the property socketId! 
     if (p.socketId) {
       Logger.dbg("notifyParticipants - Including connected participant", p.mail);
@@ -484,10 +495,16 @@ module.exports = {
 
         Logger.dbg("EVENT clientReady - User Retrival [" + pack + "] - ", user, ["code", "mail"]);
 
-        const session = await Session.findOne({
+        var session = await Session.findOne({
           name: user.subject,
           environment: process.env.NODE_ENV,
         });
+        if (session == null) {
+          var session = await StandardSession.findOne({
+            name: user.subject,
+            environment: process.env.NODE_ENV,
+          });
+        }
         if (session && session.active) {
           userToSocketID.set(user.code, socket.id);
           user.socketId = socket.id; // TODO: Will be placed outside this function at some point
