@@ -27,18 +27,22 @@ async function wait(ms) {
   await setTimeout(() => { }, ms);
 }
 
-function randomIntFromInterval(min, max) { // min and max included 
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
-var exercisesVisited = [];
-async function randomizeExercises(testSize) {
-  var num = randomIntFromInterval(1, testSize);
-  while (exercisesVisited.includes(num)) {
-    num = randomIntFromInterval(1, testSize);
+function shuffleExercises(array) {
+  for (var i = 0; i < array.length; i++) {
+    const j = Math.floor(Math.random() * (array.length))
+    if(array[i].type != "INDIVIDUAL" && array[j].type != "INDIVIDUAL" ) {
+      var aux = array[i];
+      array[i] = array[j];
+      array[j] = aux;
+    }
   }
-  exercisesVisited.push(num);
-  return num;
+
+  for (exerciseIndex in array) {
+    array[exerciseIndex].orderNumber = parseInt(exerciseIndex) + 1;
+  }
+  return array;
 }
+
 
 
 //A function to test if user has finished or to bring him/her a new exercise
@@ -115,6 +119,8 @@ async function executeSession(sessionName, io) {
     });
     isStandard = true;
   }
+
+
   if (!isStandard) {
     session.running = true;
     session.save(); //Saves it on database
@@ -235,14 +241,10 @@ async function executeSession(sessionName, io) {
     session.running = true;
     session.save(); //Saves it on database
     console.log("ES ESTANDAR");
-    /*
-    var event = ["loadTest", {
-      data: {
-        testDescription: tests[0].description,
-        peerChange: tests[0].peerChange,
-      }
-    }];
-    */
+    
+    var sessionExercises = shuffleExercises(session.exercises);
+
+    console.log(sessionExercises);
   }
 }
 
