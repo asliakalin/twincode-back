@@ -240,11 +240,27 @@ async function executeSession(sessionName, io) {
   } else {
     session.running = true;
     session.save(); //Saves it on database
-    console.log("ES ESTANDAR");
+    Logger.dbg("executeStandardSession - Running ", session, ["name", "pairingMode", "tokenPairing", "blindParticipant"]);
     
     var sessionExercises = shuffleExercises(session.exercises);
+    sessionExercises.sort((a, b) => (a.orderNumber > b.orderNumber) ? 1 : -1)
 
-    console.log(sessionExercises);
+    let timer = 0;
+    let maxExercises = sessionExercises.length;
+    Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
+    //Here it is loaded the test
+    var event = ["loadTest", {
+      data: {
+        testDescription: "PART TEST",
+        peerChange: true,
+      }
+    }];
+
+    io.to(sessionName).emit(event[0], event[1]);
+
+    lastSessionEvent.set(sessionName, event);
+    Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
+    //TODO De setInterval() Lo que hay que tomar es el ultimo else. Session.exerciseCounter va incrementando hasta que llega al ultimo. No hay tests
   }
 }
 

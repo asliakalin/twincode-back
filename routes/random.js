@@ -3,6 +3,7 @@ var express = require("express");
 const router = express.Router();
 const consumer = require("../consumer.js");
 const StandardSession = require("../models/StandardSession.js");
+const User = require("../models/User.js");
 
 
 router.post("/startStandardSession/:sessionName", async (req, res) => {
@@ -16,6 +17,29 @@ router.post("/startStandardSession/:sessionName", async (req, res) => {
     }
 });
 
+router.post("/resetStandardSession", async (req, res) => {
+    const adminSecret = req.headers.authorization;
+  
+    if (adminSecret === process.env.ADMIN_SECRET) {
+      await StandardSession.collection.updateOne(
+        {
+          name: req.body.session,
+          environment: process.env.NODE_ENV,
+        },
+        { $set: { testCounter: 0, exerciseCounter: -1, running: false } },
+        { multi: false, safe: true }
+      );
+      const users = await User.collection.updateMany(
+        { subject: req.body.session, environment: process.env.NODE_ENV },
+        { $unset: { token: true, socketId: true, room: true, blind: true } },
+        { multi: true, safe: true }
+      );
+      res.send(users);
+      console.log("Session " + req.body.session + " reset completed");
+    } else {
+      res.sendStatus(401);
+    }
+  });
 
 router.get("/StandardSession/:sessionName", async (req, res) => {
     try {
