@@ -26,7 +26,7 @@ router.post("/resetStandardSession", async (req, res) => {
           name: req.body.session,
           environment: process.env.NODE_ENV,
         },
-        { $set: { testCounter: 0, exerciseCounter: -1, running: false } },
+        { $set: { testCounter: 0, exerciseCounter: -1, running: false, nextPart: false } },
         { multi: false, safe: true }
       );
       const users = await User.collection.updateMany(

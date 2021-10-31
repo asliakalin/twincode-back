@@ -242,8 +242,43 @@ async function executeSession(sessionName, io) {
     session.save(); //Saves it on database
     Logger.dbg("executeStandardSession - Running ", session, ["name", "pairingMode", "tokenPairing", "blindParticipant"]);
     
-    var sessionExercises = shuffleExercises(session.exercises);
-    sessionExercises.sort((a, b) => (a.orderNumber > b.orderNumber) ? 1 : -1)
+    var individualExercises = [];
+    var pairExercises = [];
+    var orderAuxiliar = 1;
+    for (let index = 0; index < session.exercises.length; index++) {
+      let element = session.exercises[index];
+      if (element.type == "INDIVIDUAL") {
+        element.orderNumber = orderAuxiliar;
+        orderAuxiliar++;
+        individualExercises.push(element);
+      } else {
+        pairExercises.push(element);
+      }
+      
+    }
+    var sessionExercises = [];
+    pairExercises = shuffleExercises(pairExercises);
+    individualExercises = shuffleExercises(pairExercises);
+    
+    pairExercises.sort((a, b) => (a.orderNumber > b.orderNumber) ? 1 : -1);
+    
+    individualExercises.sort((a, b) => (a.orderNumber > b.orderNumber) ? 1 : -1);
+
+    for (let index = 0; index < pairExercises.length/2; index++) {
+      const element = pairExercises[index];
+      sessionExercises.push(element);
+    }
+
+    for (let index = 0; index < individualExercises.length; index++) {
+      const element = individualExercises[index];
+      sessionExercises.push(element);
+    }
+    
+    for (let index = pairExercises.length/2; index < pairExercises.length; index++) {
+      const element = pairExercises[index];
+      sessionExercises.push(element);
+    }
+    
 
     let timer = 0;
     let maxExercises = sessionExercises.length;
@@ -260,7 +295,91 @@ async function executeSession(sessionName, io) {
 
     lastSessionEvent.set(sessionName, event);
     Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
-    //TODO De setInterval() Lo que hay que tomar es el ultimo else. Session.exerciseCounter va incrementando hasta que llega al ultimo. No hay tests
+    
+    var counterAux = 1;
+
+    const interval = setInterval(function () {
+      if (session.testCounter == 3) {
+        Logger.dbg("There are no more tests, the session <" + session.name + "> has finish!");
+        Logger.dbg("executeSession - emitting 'finish' event in session " + session.name + " #############################");
+
+        io.to(sessionName).emit("finish");
+        lastSessionEvent.set(sessionName, ["finish"]);
+        Logger.dbg("executeSession - lastSessionEvent saved", event);
+
+        clearInterval(interval);
+      } else if (timer > 0) { //If timer hasn't finished counting, it goes down
+        io.to(sessionName).emit("countDown", {
+          data: timer,
+        });
+        Logger.dbg(timer);
+        timer--;
+      } else if ((session.testCounter == 0 && session.exerciseCounter == pairExercises.length / 2) || (session.testCounter == 1 && session.exerciseCounter == pairExercises.length / 2 + individualExercises.length)|| (session.testCounter == 2 && session.exerciseCounter == pairExercises.length + individualExercises.length)) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
+        Logger.dbg("Going to the next test!");
+        session.testCounter++;
+        //If exercises have been finished, it pass to a new test
+        Logger.dbg("Loading test");
+
+        var event = ["loadTest", {
+          data: {
+            testDescription: session.partsMessage[session.testCounter],
+            peerChange: true,
+          },
+        }];
+        io.to(sessionName).emit(event[0], event[1]);
+
+        lastSessionEvent.set(sessionName, event);
+        Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
+
+
+        timer = session.partsTimes[session.testCounter]; //Resets the timer
+        Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
+
+      } else { //If nothing before happens, it means that there are more exercises to do, and then in goes to the next one
+        Logger.dbg("Starting new exercise:");
+        let testLanguage = session.language;
+        let exercise =
+          sessionExercises[session.exerciseCounter];
+        if (exercise) {
+          Logger.dbg("   " + exercise.description.substring(0, Math.min(80, exercise.description.length)) + "...");
+
+          var event = ["newExercise", {
+            data: {
+              maxTime: timer,
+              exerciseDescription: exercise.description,
+              exerciseType: exercise.type,
+              inputs: exercise.inputs,
+              solutions: exercise.solutions,
+              testLanguage: testLanguage,
+            },
+          }];
+          io.to(sessionName).emit(event[0], event[1]);
+          lastSessionEvent.set(sessionName, event);
+          Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
+
+          sessions.set(session.name, {
+            session: session,
+            exerciseType: exercise.type,
+          });
+        }
+        session.exerciseCounter++; //After that, it increments the counter to test in the before code if thera are more or not
+        Logger.dbg(" testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
+
+        session.save();
+        Logger.dbg("executeSession - session saved ");
+      }
+
+
+      StandardSession.findOne({
+        name: sessionName,
+        environment: process.env.NODE_ENV,
+      }).then((currentSession) => {
+        if (!currentSession.running) {
+          clearInterval(interval);
+          Logger.dbg("executeSession - clearInterval");
+        }
+      });
+    }, 1000);
   }
 }
 

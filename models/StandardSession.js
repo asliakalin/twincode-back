@@ -7,12 +7,15 @@ const SessionSchema = new Schema({
   active: { type: Boolean, default: false },
   tokens: { type: Array, required: true },
   running: { type: Boolean, default: false },
+  testCounter: { type: Number, default: 0 },
   registrationText: { type: String },
   finishMessage: { type: String },
-  exerciseCounter: { type: Number, default: -1 },
+  exerciseCounter: { type: Number, default: 0 },
   blindParticipant: { type: Boolean, default: true },
   exercises: { type: Array, required: true },
   breaks: { type: Array, required: true },
+  partsMessage: { type: Array, required: true, default: ["PART 1 IN PAIR", "PART 2 INDIVIDUAL", "PART 3 IN PAIR"] },
+  language: { type: String, required: true, default: "javascript"},
   partsTimes: { type: Array, required: true, default: [600, 300, 600] }
 });
 
