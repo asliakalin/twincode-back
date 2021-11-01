@@ -305,13 +305,13 @@ async function executeSession(sessionName, io) {
         Logger.dbg("executeSession - lastSessionEvent saved", event);
 
         clearInterval(interval);
-      } else if (timer > 0 && session.nextExercise == false) { //If timer hasn't finished counting, it goes down
+      } else if (timer > 0 && !session.nextExercise) { //If timer hasn't finished counting, it goes down
         io.to(sessionName).emit("countDown", {
           data: timer,
         });
         Logger.dbg(timer);
         timer--;
-      } else if (session.nextExercise == false && (session.testCounter == 0 && session.exerciseCounter == pairExercises.length / 2) || (session.testCounter == 1 && session.exerciseCounter == pairExercises.length / 2 + individualExercises.length) || (session.testCounter == 2 && session.exerciseCounter == pairExercises.length + individualExercises.length)) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
+      } else if (!session.nextExercise && ((session.testCounter == 0 && session.exerciseCounter == pairExercises.length / 2) || (session.testCounter == 1 && session.exerciseCounter == pairExercises.length / 2 + individualExercises.length) || (session.testCounter == 2 && session.exerciseCounter == pairExercises.length + individualExercises.length) || (session.exerciseCounter == 0))) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
         Logger.dbg("Going to the next test!");
         session.testCounter++;
         //If exercises have been finished, it pass to a new test
@@ -376,7 +376,6 @@ async function executeSession(sessionName, io) {
         Logger.dbg("executeSession - session saved ");
 
         session.nextExercise = false;
-        session.save()
       }
 
 
