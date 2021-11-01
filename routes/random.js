@@ -17,6 +17,18 @@ router.post("/startStandardSession/:sessionName", async (req, res) => {
     }
 });
 
+
+router.post("/nextExercise/:sessionName", async (req, res) => {
+  await StandardSession.collection.updateOne(
+    {
+      name: req.params.session,
+      environment: process.env.NODE_ENV,
+    },
+    { $set: { nextExercise: true } },
+    { multi: false, safe: true }
+  );
+});
+
 router.post("/resetStandardSession", async (req, res) => {
     const adminSecret = req.headers.authorization;
   

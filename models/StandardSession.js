@@ -16,6 +16,7 @@ const SessionSchema = new Schema({
   breaks: { type: Array, required: true },
   partsMessage: { type: Array, required: true, default: ["PART 1 IN PAIR", "PART 2 INDIVIDUAL", "PART 3 IN PAIR"] },
   language: { type: String, required: true, default: "javascript"},
+  nextExercise : { type: Boolean, required: true, default: false },
   partsTimes: { type: Array, required: true, default: [600, 300, 600] }
 });
 
