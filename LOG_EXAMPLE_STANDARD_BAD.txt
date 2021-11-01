@@ -1,0 +1,317 @@
+}
+DEBUG - notifyParticipants - Including connected participant <"davinia.garcia@hotmail.com">
+DEBUG - notifyParticipants - MANUAL pairing
+DEBUG - notifyParticipants - the participant count is even, PERFECT 
+PAIRING! :-)
+DEBUG - notifyParticipants - Re-assigning rooms to avoid race conditions!
+DEBUG - notifyParticipants - Pair created in room <100>:
+    -511115, David2, David2, Male, true
+    -115511, Davinia, Davinia, Female, false
+DEBUG - notifyParticipants - connected participants:  <{"code":"511115","mail":"david.brincau@hotmail.com","room":100,"blind":true,...}>DEBUG - notifyParticipants - connected participants:  <{"code":"115511","mail":"davinia.garcia@hotmail.com","room":100,"blind":false,...}>
+DEBUG - notifyParticipants - connectedUsers cleared <{"dataType":"Map","value":[]}>
+DEBUG - notifyParticipants - Saving user <{"code":"511115","firstName":"David2","gender":"Male","room":100,"blind":true,...}>
+DEBUG - notifyParticipants - Saving room in DB for 511115 <100>
+DEBUG - notifyParticipants - Found pair of 511115 in room100 <{"code":"115511","mail":"davinia.garcia@hotmail.com",...}>
+DEBUG - notifyParticipants - Session <FirstStandardSession> - Emitting 'sessionStart' event to <511115> in room <FirstStandardSession100>
+DEBUG - notifyParticipants - Saving user <{"code":"115511","firstName":"Davinia","gender":"Female","room":100,"blind":false,...}>       
+DEBUG - notifyParticipants - Saving room in DB for 115511 <100>
+DEBUG - notifyParticipants - Found pair of 115511 in room100 <{"code":"511115","mail":"david.brincau@hotmail.com",...}>
+DEBUG - notifyParticipants - Session <FirstStandardSession> - Emitting 'sessionStart' event to <115511> in room <FirstStandardSession100>
+DEBUG - notifyParticipants - connectedUsers after notification <{"dataType":"Map","value":[["511115","115511"],["115511","511115"]]}>   
+DEBUG - NEW CONNECTION EJK9kvjHiAwAN4s2AAAE
+DEBUG - NEW CONNECTION rLDEkFaBbiHBY8m0AAAF
+DEBUG - Saving Log - NewConn - EJK9kvjHiAwAN4s2AAAE:  <"New user with socket id EJK9kvjHiAwAN4s2AAAE has entered">
+DEBUG - EVENT clientReconnection  <"511115">
+DEBUG - EVENT clientReconnection  <"511115">
+DEBUG - EVENT clientReconnection  <"115511">
+DEBUG - EVENT clientReconnection  <"115511">
+DEBUG - EVENT clientReconnection  <"115511">
+DEBUG - Saving Log - NewConn - rLDEkFaBbiHBY8m0AAAF:  <"New user with socket id rLDEkFaBbiHBY8m0AAAF has entered">
+DEBUG - EVENT clientReconnection - user found <{"code":"511115","socketId":"hFv21V-4LIPcbLl9AAAD",...}>
+DEBUG - EVENT clientReconnection - Saving user <{"code":"511115","firstName":"David2","gender":"Male","room":100,"blind":true,...}>     
+DEBUG - EVENT clientReconnection - user found <{"code":"511115","socketId":"hFv21V-4LIPcbLl9AAAD",...}>
+DEBUG - EVENT clientReconnection - Saving user <{"code":"511115","firstName":"David2","gender":"Male","room":100,"blind":true,...}>     
+DEBUG - EVENT clientReconnection - user found <{"code":"115511","socketId":"hvzQjihp0Z48py-eAAAC",...}>
+DEBUG - EVENT clientReconnection - Saving user <{"code":"115511","firstName":"Davinia","gender":"Female","room":100,"blind":false,...}> 
+DEBUG - EVENT clientReconnection - user found <{"code":"115511","socketId":"hvzQjihp0Z48py-eAAAC",...}>
+DEBUG - EVENT clientReconnection - Saving user <{"code":"115511","firstName":"Davinia","gender":"Female","room":100,"blind":false,...}> 
+DEBUG - EVENT clientReconnection - user found <{"code":"115511","socketId":"hvzQjihp0Z48py-eAAAC",...}>
+DEBUG - EVENT clientReconnection - Saving user <{"code":"115511","firstName":"Davinia","gender":"Female","room":100,"blind":false,...}> 
+DEBUG - EVENT clientReconnection - socketId updated <{"code":"511115","socketId":"EJK9kvjHiAwAN4s2AAAE",...}>
+DEBUG - EVENT clientReconnection : LAST EVENT NOT FOUND for session 
+FirstStandardSession
+DEBUG - EVENT clientReconnection - socketId updated <{"code":"511115","socketId":"EJK9kvjHiAwAN4s2AAAE",...}>
+DEBUG - EVENT clientReconnection : LAST EVENT NOT FOUND for session 
+FirstStandardSession
+DEBUG - EVENT clientReconnection - socketId updated <{"code":"115511","socketId":"rLDEkFaBbiHBY8m0AAAF",...}>
+DEBUG - EVENT clientReconnection : LAST EVENT NOT FOUND for session 
+FirstStandardSession
+DEBUG - EVENT clientReconnection - socketId updated <{"code":"115511","socketId":"rLDEkFaBbiHBY8m0AAAF",...}>
+DEBUG - EVENT clientReconnection : LAST EVENT NOT FOUND for session 
+FirstStandardSession
+DEBUG - EVENT clientReconnection - socketId updated <{"code":"115511","socketId":"rLDEkFaBbiHBY8m0AAAF",...}>
+DEBUG - EVENT clientReconnection : LAST EVENT NOT FOUND for session 
+FirstStandardSession
+DEBUG - EVENT clientReconnection  <"511115">
+DEBUG - EVENT clientReconnection - user found <{"code":"511115","socketId":"EJK9kvjHiAwAN4s2AAAE",...}>
+DEBUG - EVENT clientReconnection - Saving user <{"code":"511115","firstName":"David2","gender":"Male","room":100,"blind":true,...}>     
+DEBUG - EVENT clientReconnection - socketId updated <{"code":"511115","socketId":"EJK9kvjHiAwAN4s2AAAE",...}>
+DEBUG - EVENT clientReconnection : LAST EVENT NOT FOUND for session 
+FirstStandardSession
+DEBUG - executeSession - Cleared last event of session FirstStandardSession
+DEBUG - executeSession - Starting FirstStandardSession
+DEBUG - executeStandardSession - Running  <{"name":"FirstStandardSession","blindParticipant":true,...}>
+DEBUG - executeSession - testCounter: 0 of 3 , exerciseCounter: -1 of 8
+DEBUG - executeSession - lastSessionEvent saved <"loadTest">        
+PAIR
+[object Object],[object Object],[object Object],[object Object]     
+IND
+[object Object],[object Object],[object Object],[object Object]     
+ALL
+[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]
+DEBUG - Starting new exercise:
+DEBUG -  testCounter: 0 of 3 , exerciseCounter: 0 of 8
+DEBUG - executeSession - session saved
+DEBUG - Starting new exercise:
+DEBUG -    <h1 style='color:blue'>EJERCICIO 4: <strong>101112</strong>......
+DEBUG - executeSession - lastSessionEvent saved <"newExercise">     
+DEBUG -  testCounter: 0 of 3 , exerciseCounter: 1 of 8
+DEBUG - executeSession - session saved
+DEBUG - Starting new exercise:
+DEBUG -    <h1 style='color:blue'>EJERCICIO 1: <strong>123</strong>......
+DEBUG - executeSession - lastSessionEvent saved <"newExercise">     
+DEBUG -  testCounter: 0 of 3 , exerciseCounter: 2 of 8
+DEBUG - executeSession - session saved
+DEBUG - Going to the next test!
+DEBUG - Loading test
+DEBUG - executeSession - lastSessionEvent saved <"loadTest">        
+DEBUG - executeSession - testCounter: 1 of 3 , exerciseCounter: 2 of 8
+DEBUG - 10
+DEBUG - 9
+DEBUG - 8
+DEBUG - 7
+DEBUG - 6
+DEBUG - 5
+DEBUG - 4
+DEBUG - 3
+DEBUG - 2
+DEBUG - 1
+DEBUG - Starting new exercise:
+DEBUG -    <h1 style='color:blue'>EJERCICIO 4: <strong>101112</strong>......
+DEBUG - executeSession - lastSessionEvent saved <"newExercise">     
+DEBUG -  testCounter: 1 of 3 , exerciseCounter: 3 of 8
+DEBUG - executeSession - session saved
+DEBUG - Starting new exercise:
+DEBUG -    <h1 style='color:blue'>EJERCICIO 1: <strong>123</strong>......
+DEBUG - executeSession - lastSessionEvent saved <"newExercise">     
+DEBUG -  testCounter: 1 of 3 , exerciseCounter: 4 of 8
+DEBUG - executeSession - session saved
+DEBUG - Starting new exercise:
+DEBUG -    <h1 style='color:blue'>EJERCICIO 2: <strong>456</strong>......
+DEBUG - executeSession - lastSessionEvent saved <"newExercise">     
+DEBUG -  testCounter: 1 of 3 , exerciseCounter: 5 of 8
+DEBUG - executeSession - session saved
+DEBUG - Starting new exercise:
+DEBUG -    <h1 style='color:blue'>EJERCICIO 3: <strong>789</strong>......
+DEBUG - executeSession - lastSessionEvent saved <"newExercise">     
+DEBUG -  testCounter: 1 of 3 , exerciseCounter: 6 of 8
+DEBUG - executeSession - session saved
+DEBUG - Going to the next test!
+DEBUG - Loading test
+DEBUG - executeSession - lastSessionEvent saved <"loadTest">        
+DEBUG - executeSession - testCounter: 2 of 3 , exerciseCounter: 6 of 8
+DEBUG - 10
+DEBUG - 9
+DEBUG - 8
+DEBUG - 7
+DEBUG - 6
+DEBUG - 5
+DEBUG - 4
+DEBUG - 3
+DEBUG - 2
+DEBUG - 1
+DEBUG - Starting new exercise:
+DEBUG -    <h1 style='color:blue'>EJERCICIO 2: <strong>456</strong>......
+DEBUG - executeSession - lastSessionEvent saved <"newExercise">     
+DEBUG -  testCounter: 2 of 3 , exerciseCounter: 7 of 8
+DEBUG - executeSession - session saved
+DEBUG - Starting new exercise:
+DEBUG -    <h1 style='color:blue'>EJERCICIO 3: <strong>789</strong>......
+DEBUG - executeSession - lastSessionEvent saved <"newExercise">     
+DEBUG -  testCounter: 2 of 3 , exerciseCounter: 8 of 8
+DEBUG - executeSession - session saved
+DEBUG - Going to the next test!
+DEBUG - Loading test
+DEBUG - executeSession - lastSessionEvent saved <"loadTest">        
+DEBUG - executeSession - testCounter: 3 of 3 , exerciseCounter: 8 of 8
+DEBUG - There are no more tests, the session <FirstStandardSession> 
+has finish!
+DEBUG - executeSession - emitting 'finish' event in session FirstStandardSession #############################
+DEBUG - executeSession - lastSessionEvent saved
+DEBUG - /finishMessage <{"code":"115511"}>
+DEBUG - /finishMessage <{"code":"511115"}>
+DEBUG - ERROR - /finishMessage - 404 - 511115
+DEBUG - ERROR - /finishMessage - 404 - 115511
+DEBUG - NEW CONNECTION RnTB8shi1cAdQwEoAAAG
+DEBUG - Saving Log - NewConn - RnTB8shi1cAdQwEoAAAG:  <"New user with socket id RnTB8shi1cAdQwEoAAAG has entered">
+DEBUG - NEW CONNECTION Eqa9Xo9AcblI6Nl1AAAH
+DEBUG - Saving Log - NewConn - Eqa9Xo9AcblI6Nl1AAAH:  <"New user with socket id Eqa9Xo9AcblI6Nl1AAAH has entered">
+Session FirstStandardSession reset completed
+
+
+
+
+
+
+
+
+
+
+
+
+FirstStandardSession
+DEBUG - executeSession - Cleared last event of session FirstStandardSession
+DEBUG - executeSession - Starting FirstStandardSession
+DEBUG - executeStandardSession - Running  <{"name":"FirstStandardSession","blindParticipant":true,...}>
+{
+  name: 'E2',
+  description: "<h1 style='color:blue'>EJERCICIO 2: <strong>456</strong>...",
+  inputs: [ 4, 5, 6 ],
+  solutions: [ 'Soy el número 4', 'Soy el número  5', 'Soy el número 6' ],
+  type: 'PAIR',
+  orderNumber: 1
+}
+{
+  name: 'E4',
+  description: "<h1 style='color:blue'>EJERCICIO 4: <strong>101112</strong>...",
+  inputs: [ 10, 11, 12 ],
+  solutions: [ 'Soy el número 10', 'Soy el número 11', 'Soy el número 12' ],
+  type: 'PAIR',
+  orderNumber: 2
+}
+{
+  name: 'E1',
+  description: "<h1 style='color:blue'>EJERCICIO 1: <strong>123</strong>...",
+  inputs: [ 1, 2, 3 ],
+  solutions: [ 'Soy el número 1', 'Soy el número 2', 'Soy el número 
+3' ],
+  type: 'PAIR',
+  orderNumber: 3
+}
+{
+  name: 'E3',
+  description: "<h1 style='color:blue'>EJERCICIO 3: <strong>789</strong>...",
+  inputs: [ 7, 8, 9 ],
+  solutions: [ 'Soy el número 7', 'Soy el número 8', 'Soy el número 
+9' ],
+  type: 'PAIR',
+  orderNumber: 4
+}
+{
+  name: 'E5',
+  description: "<h1 style='color:blue'>EJERCICIO 5: <strong>131415</strong>...",
+  inputs: [ 13, 14, 15 ],
+  solutions: [ 'Soy el número 13', 'Soy el número 14', 'Soy el número 15' ],
+  type: 'INDIVIDUAL',
+  orderNumber: 1
+}
+[
+  {
+    name: 'E2',
+    description: "<h1 style='color:blue'>EJERCICIO 2: <strong>456</strong>...",
+    inputs: [ 4, 5, 6 ],
+    solutions: [ 'Soy el número 4', 'Soy el número  5', 'Soy el número 6' ],
+    type: 'PAIR',
+    orderNumber: 1
+  },
+  {
+    name: 'E4',
+    description: "<h1 style='color:blue'>EJERCICIO 4: <strong>101112</strong>...",
+    inputs: [ 10, 11, 12 ],
+    solutions: [ 'Soy el número 10', 'Soy el número 11', 'Soy el número 12' ],
+    type: 'PAIR',
+    orderNumber: 2
+  },
+  {
+    name: 'E1',
+    description: "<h1 style='color:blue'>EJERCICIO 1: <strong>123</strong>...",
+    inputs: [ 1, 2, 3 ],
+    solutions: [ 'Soy el número 1', 'Soy el número 2', 'Soy el número 3' ],
+    type: 'PAIR',
+    orderNumber: 3
+  },
+  {
+    name: 'E3',
+    description: "<h1 style='color:blue'>EJERCICIO 3: <strong>789</strong>...",
+    inputs: [ 7, 8, 9 ],
+    solutions: [ 'Soy el número 7', 'Soy el número 8', 'Soy el número 9' ],
+    type: 'PAIR',
+    orderNumber: 4
+  }
+]
+[
+  {
+    name: 'E5',
+    description: "<h1 style='color:blue'>EJERCICIO 5: <strong>131415</strong>...",
+    inputs: [ 13, 14, 15 ],
+    solutions: [ 'Soy el número 13', 'Soy el número 14', 'Soy el número 15' ],
+    type: 'INDIVIDUAL',
+    orderNumber: 1
+  }
+]
+
+
+
+
+- EVENT clientReconnection - socketId updated <{"code":"511115","socketId":"yGGxo-mScpV6rDG3AAAC",...}>
+DEBUG - EVENT clientReconnection : LAST EVENT NOT FOUND for session 
+FirstStandardSession
+DEBUG - executeSession - Cleared last event of session FirstStandardSession
+DEBUG - executeSession - Starting FirstStandardSession
+DEBUG - executeStandardSession - Running  <{"name":"FirstStandardSession","blindParticipant":true,...}>
+[
+  {
+    name: 'E4',
+    description: "<h1 style='color:blue'>EJERCICIO 4: <strong>101112</strong>...",
+    inputs: [ 10, 11, 12 ],
+    solutions: [ 'Soy el número 10', 'Soy el número 11', 'Soy el número 12' ],
+    type: 'PAIR',
+    orderNumber: 1
+  },
+  {
+    name: 'E2',
+    description: "<h1 style='color:blue'>EJERCICIO 2: <strong>456</strong>...",
+    inputs: [ 4, 5, 6 ],
+    solutions: [ 'Soy el número 4', 'Soy el número  5', 'Soy el número 6' ],
+    type: 'PAIR',
+    orderNumber: 2
+  },
+  {
+    name: 'E5',
+    description: "<h1 style='color:blue'>EJERCICIO 5: <strong>131415</strong>...",
+    inputs: [ 13, 14, 15 ],
+    solutions: [ 'Soy el número 13', 'Soy el número 14', 'Soy el número 15' ],
+    type: 'INDIVIDUAL',
+    orderNumber: 1
+  },
+  {
+    name: 'E1',
+    description: "<h1 style='color:blue'>EJERCICIO 1: <strong>123</strong>...",
+    inputs: [ 1, 2, 3 ],
+    solutions: [ 'Soy el número 1', 'Soy el número 2', 'Soy el número 3' ],
+    type: 'PAIR',
+    orderNumber: 3
+  },
+  {
+    name: 'E3',
+    description: "<h1 style='color:blue'>EJERCICIO 3: <strong>789</strong>...",
+    inputs: [ 7, 8, 9 ],
+    solutions: [ 'Soy el número 7', 'Soy el número 8', 'Soy el número 9' ],
+    type: 'PAIR',
+    orderNumber: 4
+  }
+]
+DEBUG - executeSession - testCounter: 0 of 3 , exerciseCounter: -1 of 5
+DEBUG - executeSession - lastSessionEvent saved <"loadTest">        
+DEBUG - Starting new exercise:
+DEBUG -  testC

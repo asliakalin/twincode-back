@@ -254,31 +254,30 @@ async function executeSession(sessionName, io) {
       } else {
         pairExercises.push(element);
       }
-      
     }
+
     var sessionExercises = [];
-    pairExercises = shuffleExercises(pairExercises);
-    individualExercises = shuffleExercises(pairExercises);
+    var pairExercisesAux = shuffleExercises(pairExercises);
+    var individualExercisesAux = shuffleExercises(individualExercises);
     
-    pairExercises.sort((a, b) => (a.orderNumber > b.orderNumber) ? 1 : -1);
+    pairExercisesAux.sort((a, b) => (a.orderNumber > b.orderNumber) ? 1 : -1);
     
-    individualExercises.sort((a, b) => (a.orderNumber > b.orderNumber) ? 1 : -1);
+    individualExercisesAux.sort((a, b) => (a.orderNumber > b.orderNumber) ? 1 : -1);
 
-    for (let index = 0; index < pairExercises.length/2; index++) {
-      const element = pairExercises[index];
+    for (let index = 0; index < pairExercisesAux.length/2; index++) {
+      const element = pairExercisesAux[index];
       sessionExercises.push(element);
     }
 
-    for (let index = 0; index < individualExercises.length; index++) {
-      const element = individualExercises[index];
+    for (let index = 0; index < individualExercisesAux.length; index++) {
+      const element = individualExercisesAux[index];
       sessionExercises.push(element);
     }
     
-    for (let index = pairExercises.length/2; index < pairExercises.length; index++) {
-      const element = pairExercises[index];
+    for (let index = pairExercisesAux.length/2; index < pairExercisesAux.length; index++) {
+      const element = pairExercisesAux[index];
       sessionExercises.push(element);
     }
-    
 
     let timer = 0;
     let maxExercises = sessionExercises.length;
@@ -296,8 +295,6 @@ async function executeSession(sessionName, io) {
     lastSessionEvent.set(sessionName, event);
     Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
     
-    var counterAux = 1;
-
     const interval = setInterval(function () {
       if (session.testCounter == 3) {
         Logger.dbg("There are no more tests, the session <" + session.name + "> has finish!");
@@ -315,11 +312,15 @@ async function executeSession(sessionName, io) {
         Logger.dbg(timer);
         timer--;
       } else if ((session.testCounter == 0 && session.exerciseCounter == pairExercises.length / 2) || (session.testCounter == 1 && session.exerciseCounter == pairExercises.length / 2 + individualExercises.length)|| (session.testCounter == 2 && session.exerciseCounter == pairExercises.length + individualExercises.length)) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
+        console.log(session.partsMessage[session.testCounter]);
+        console.log(session.testCounter);
         Logger.dbg("Going to the next test!");
         session.testCounter++;
         //If exercises have been finished, it pass to a new test
         Logger.dbg("Loading test");
 
+        console.log(session.partsMessage[session.testCounter]);
+        console.log(session.testCounter);
         var event = ["loadTest", {
           data: {
             testDescription: session.partsMessage[session.testCounter],
@@ -332,7 +333,7 @@ async function executeSession(sessionName, io) {
         Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
 
 
-        timer = session.partsTimes[session.testCounter]; //Resets the timer
+        timer = 10; //Resets the timer
         Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
 
       } else { //If nothing before happens, it means that there are more exercises to do, and then in goes to the next one
@@ -342,10 +343,17 @@ async function executeSession(sessionName, io) {
           sessionExercises[session.exerciseCounter];
         if (exercise) {
           Logger.dbg("   " + exercise.description.substring(0, Math.min(80, exercise.description.length)) + "...");
+          
+          let auxTimer;
+          if (timer > 0) {
+            auxTimer = timer;
+          } else {
+            auxTimer = session.partsTimes[session.testCounter];
+          }
 
           var event = ["newExercise", {
             data: {
-              maxTime: timer,
+              maxTime: auxTimer,
               exerciseDescription: exercise.description,
               exerciseType: exercise.type,
               inputs: exercise.inputs,
@@ -361,6 +369,7 @@ async function executeSession(sessionName, io) {
             session: session,
             exerciseType: exercise.type,
           });
+          timer = auxTimer;
         }
         session.exerciseCounter++; //After that, it increments the counter to test in the before code if thera are more or not
         Logger.dbg(" testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
@@ -394,7 +403,6 @@ async function notifyParticipants(sessionName, io) {
   var participants = [];
   Logger.dbg("notifyParticipants - Number of potential participants: " + potentialParticipants.length);
   potentialParticipants.forEach((p) => {
-    console.log(p);
     //Filter out the one not connected : they don't have the property socketId! 
     if (p.socketId) {
       Logger.dbg("notifyParticipants - Including connected participant", p.mail);
