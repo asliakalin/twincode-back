@@ -43,7 +43,22 @@ function shuffleExercises(array) {
   return array;
 }
 
+async function newExercise(id, description) {
+  Logger.dbg("Friend " + id + " is out of time!");
+  const user = await User.findOne({
+    socketId: id,
+    environment: process.env.NODE_ENV,
+  });
+  if (user) {
+    const room = await Room.findOne({
+      session: user.subject,
+      name: user.room.toString(),
+      environment: process.env.NODE_ENV,
+    });
 
+    console.log(room);
+    }
+}
 
 //A function to test if user has finished or to bring him/her a new exercise
 async function exerciseTimeUp(id, description) {
@@ -312,7 +327,28 @@ async function executeSession(sessionName, io) {
         });
         Logger.dbg(timer);
         timer--;
-      } else if (false) { //If Users ask for a new exercise or finish the one the are doing
+      } else if ((session.testCounter == 0 && session.exerciseCounter == 0) || (session.testCounter == 0 && session.exerciseCounter == pairExercises.length / 2) || (session.testCounter == 1 && session.exerciseCounter == pairExercises.length / 2 + individualExercises.length) || (session.testCounter == 2 && session.exerciseCounter == pairExercises.length + individualExercises.length)) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
+        Logger.dbg("Going to the next test!");
+        //If exercises have been finished, it pass to a new test
+        Logger.dbg("Loading test");
+
+        var event = ["loadTest", {
+          data: {
+            testDescription: session.partsMessage[session.testCounter],
+            peerChange: true,
+          },
+        }];
+        io.to(sessionName).emit(event[0], event[1]);
+
+        lastSessionEvent.set(sessionName, event);
+        Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
+
+
+        timer = 10; //Resets the timer
+        Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
+
+        session.testCounter++;
+      } else { //If Users ask for a new exercise or finish the one the are doing
         Logger.dbg("Starting new exercise:");
         let testLanguage = session.language;
         let exercise =
@@ -347,28 +383,7 @@ async function executeSession(sessionName, io) {
         Logger.dbg("executeSession - session saved ");
 
         session.nextExercise = false;
-      } else if ((session.testCounter == 0 && session.exerciseCounter == 0) || (session.testCounter == 0 && session.exerciseCounter == pairExercises.length / 2) || (session.testCounter == 1 && session.exerciseCounter == pairExercises.length / 2 + individualExercises.length) || (session.testCounter == 2 && session.exerciseCounter == pairExercises.length + individualExercises.length)) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
-        Logger.dbg("Going to the next test!");
-        //If exercises have been finished, it pass to a new test
-        Logger.dbg("Loading test");
-
-        var event = ["loadTest", {
-          data: {
-            testDescription: session.partsMessage[session.testCounter],
-            peerChange: true,
-          },
-        }];
-        io.to(sessionName).emit(event[0], event[1]);
-
-        lastSessionEvent.set(sessionName, event);
-        Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
-
-
-        timer = 10; //Resets the timer
-        Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
-
-        session.testCounter++;
-      } 
+      }
 
       StandardSession.findOne({
         name: sessionName,
@@ -946,6 +961,10 @@ module.exports = {
         if (!pack.data.gotRight) {
           await exerciseTimeUp(socket.id, pack.data);
         }
+      });
+      
+      socket.on("resolvedExercise", async (isExerciseCorrect) => {
+        await newExercise(socket.id, isExerciseCorrect);
       });
 
       socket.on("clientFinished", async (data) => {
