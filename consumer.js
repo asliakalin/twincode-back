@@ -295,6 +295,7 @@ async function executeSession(sessionName, io) {
     lastSessionEvent.set(sessionName, event);
     Logger.dbg("executeSession - lastSessionEvent saved", event[0]);
     
+
     const interval = setInterval(function () {
       if (session.testCounter == 3) {
         Logger.dbg("There are no more tests, the session <" + session.name + "> has finish!");
@@ -305,20 +306,17 @@ async function executeSession(sessionName, io) {
         Logger.dbg("executeSession - lastSessionEvent saved", event);
 
         clearInterval(interval);
-      } else if (timer > 0 && !session.nextExercise) { //If timer hasn't finished counting, it goes down
+      } else if (timer > 0) { //If timer hasn't finished counting, it goes down
         io.to(sessionName).emit("countDown", {
           data: timer,
         });
         Logger.dbg(timer);
         timer--;
-      } else if (!session.nextExercise && ((session.testCounter == 0 && session.exerciseCounter == pairExercises.length / 2) || (session.testCounter == 1 && session.exerciseCounter == pairExercises.length / 2 + individualExercises.length) || (session.testCounter == 2 && session.exerciseCounter == pairExercises.length + individualExercises.length) || (session.exerciseCounter == 0))) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
+      } else if ((session.testCounter == 0 && session.exerciseCounter == 0) || (session.testCounter == 0 && session.exerciseCounter == pairExercises.length / 2) || (session.testCounter == 1 && session.exerciseCounter == pairExercises.length / 2 + individualExercises.length) || (session.testCounter == 2 && session.exerciseCounter == pairExercises.length + individualExercises.length)) { //If timer goes to 0, and exercise in a test is the same as actual exercise, it goes to the next test
         Logger.dbg("Going to the next test!");
-        session.testCounter++;
         //If exercises have been finished, it pass to a new test
         Logger.dbg("Loading test");
 
-        console.log(session.partsMessage[session.testCounter]);
-        console.log(session.testCounter);
         var event = ["loadTest", {
           data: {
             testDescription: session.partsMessage[session.testCounter],
@@ -334,6 +332,7 @@ async function executeSession(sessionName, io) {
         timer = 10; //Resets the timer
         Logger.dbg("executeSession - testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
 
+        session.testCounter++;
       } else { //If nothing before happens, it means that there are more exercises to do, and then in goes to the next one
         Logger.dbg("Starting new exercise:");
         let testLanguage = session.language;
@@ -342,16 +341,9 @@ async function executeSession(sessionName, io) {
         if (exercise) {
           Logger.dbg("   " + exercise.description.substring(0, Math.min(80, exercise.description.length)) + "...");
           
-          let auxTimer;
-          if (timer > 0) {
-            auxTimer = timer;
-          } else {
-            auxTimer = session.partsTimes[session.testCounter];
-          }
-
           var event = ["newExercise", {
             data: {
-              maxTime: auxTimer,
+              maxTime: timer,
               exerciseDescription: exercise.description,
               exerciseType: exercise.type,
               inputs: exercise.inputs,
@@ -367,7 +359,7 @@ async function executeSession(sessionName, io) {
             session: session,
             exerciseType: exercise.type,
           });
-          timer = auxTimer;
+          timer = timer <= 0 ? session.partsTimes[session.testCounter] : timer;
         }
         session.exerciseCounter++; //After that, it increments the counter to test in the before code if thera are more or not
         Logger.dbg(" testCounter: " + session.testCounter + " of " + 3 + " , exerciseCounter: " + session.exerciseCounter + " of " + maxExercises);
@@ -377,7 +369,6 @@ async function executeSession(sessionName, io) {
 
         session.nextExercise = false;
       }
-
 
       StandardSession.findOne({
         name: sessionName,
